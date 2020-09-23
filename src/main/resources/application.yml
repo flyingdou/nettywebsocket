@@ -1,0 +1,8 @@
+server:
+  port: 8080
+
+webSocket:
+  netty:
+    port: 9080
+    path: /ws
+

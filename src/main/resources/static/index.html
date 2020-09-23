@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Netty-Websocket</title>
+    <script type="text/javascript">
+        var paramStr = decodeURI(location.search);
+        var socket;
+        if (!window.WebSocket) {
+            window.WebSocket = window.MozWebSocket;
+        }
+        if (window.WebSocket) {
+            socket = new WebSocket("ws://" + location.hostname + ":9080/ws" + paramStr);
+            socket.onmessage = function (event) {
+                var ta = document.getElementById('responseText');
+                let resData = JSON.parse(event.data);
+                console.log(resData);
+                ta.value += "用户: " + resData.senderId + "\t\t消息: " + resData.msgEntity + "\r\n";
+            };
+            socket.onopen = function (event) {
+                var ta = document.getElementById('responseText');
+                ta.value = "Netty-WebSocket服务器。。。。。。连接  \r\n";
+            };
+            socket.onclose = function (event) {
+                var ta = document.getElementById('responseText');
+                ta.value = "Netty-WebSocket服务器。。。。。。关闭 \r\n";
+            };
+        } else {
+            alert("您的浏览器不支持WebSocket协议！");
+        }
+
+        function send(sendUserId, receiverId, message) {
+            if (!window.WebSocket) {
+                return;
+            }
+            let param = {
+                senderId: sendUserId,
+                receiverId: receiverId,
+                msgEntity: message
+            }
+            if (socket.readyState == WebSocket.OPEN) {
+                let resData = JSON.stringify(param);
+                console.log(resData);
+                socket.send(resData);
+            } else {
+                alert("WebSocket 连接没有建立成功！");
+            }
+
+        }
+
+    </script>
+</head>
+<body>
+<form onSubmit="return false;">
+    <div>
+        <label>sendUserId</label><input type="text" name="sendUserId" value="15527930302"/> <br/>
+        <label>receiverId</label><input type="text" name="receiverId" value="45213987147"/> <br/>
+        <label>TEXT</label><input type="text" name="message" value="this is a test message"/> <br/>
+        <br/> <input type="button" value="发送ws消息"
+                     onClick="send(this.form.sendUserId.value,this.form.receiverId.value, this.form.message.value)"/>
+    </div>
+    <hr color="black"/>
+    <h3>服务端返回的应答消息</h3>
+    <textarea id="responseText" style="width: 1024px;height: 300px;"></textarea>
+</form>
+</body>
+</html>
+
+
+
